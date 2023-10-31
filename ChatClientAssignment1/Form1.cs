@@ -55,10 +55,10 @@ namespace ChatClientAssignment1
 
             //Locking added per Thread Safety - Resource provided on brightspace
             // Thread-safe addition of text to the textbox.
-            //lock (_textboxLock)
-            //{
-            //    textbox.AppendText(text);
-            //}
+            lock (_textboxLock)
+            {
+                textbox.AppendText(text);
+            }
         }
 
         // Event handler for connecting to the server.
@@ -78,13 +78,25 @@ namespace ChatClientAssignment1
         }
 
         // Event handler for sending messages.
+        //private void sendButton_Click(object sender, EventArgs e)
+        //{
+        //    string message = textSend.Text;
+        //    Task.Run(() =>     //task usage provided by https://www.bytehide.com/blog/task-run-csharp  and https://stackoverflow.com/questions/17119075/do-you-have-to-put-task-run-in-a-method-to-make-it-async
+        //    {
+        //        _chatClient.SendMessage(message);
+        //        //_chatClient.SendMessage(message, "Client");
+        //    });
+        //    textSend.Clear();
+        //}
+
         private void sendButton_Click(object sender, EventArgs e)
         {
             string message = textSend.Text;
-            Task.Run(() =>     //task usage provided by https://www.bytehide.com/blog/task-run-csharp  and https://stackoverflow.com/questions/17119075/do-you-have-to-put-task-run-in-a-method-to-make-it-async
+            Task.Run(() =>
             {
                 _chatClient.SendMessage(message);
-                //_chatClient.SendMessage(message, "Client");
+                string formattedMessage = $"{DateTime.Now:HH:mm:ss} [Client] {message}";
+                AppendTextToTextbox(txtConv, formattedMessage + Environment.NewLine);
             });
             textSend.Clear();
         }
