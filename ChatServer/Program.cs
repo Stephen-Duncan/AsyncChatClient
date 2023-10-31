@@ -81,7 +81,6 @@ namespace AsyncChatServer
                 {
                     int i = stream.Read(bytes, 0, bytes.Length);
 
-                    // If no bytes are read, the client has disconnected.
                     if (i == 0)
                     {
                         Console.WriteLine("[Server]: Client disconnected.");
@@ -91,18 +90,15 @@ namespace AsyncChatServer
                     }
 
                     string data = Encoding.ASCII.GetString(bytes, 0, i);
-                    Console.WriteLine("[Client]: {0}", data);
+                    Console.WriteLine("{0}", data);
 
-                    // If a start message is received, start sending simulated data.
-                    if (data.Trim() == "Simulation Start")
+                    if (data.Trim() == "[Client]: Simulation Start")
                     {
-                        Thread sendThread = new Thread(() => SendSimulatedData(stream));
-                        sendThread.Start();
+                        SendSimulatedData(stream);
                     }
                 }
                 catch (Exception ex)
                 {
-                    // Handle any errors that might occur while reading from the stream.
                     Console.WriteLine($"[Server]: Error - {ex.Message}");
                     _connectedClient.Close();
                     _connectedClient = null;
@@ -112,18 +108,23 @@ namespace AsyncChatServer
         }
 
         // Send simulated data to the client.
+        // Simplified function to send simulated data.
         static void SendSimulatedData(NetworkStream stream)
         {
-            for (int j = 0; j < 100; j++)
+            Console.WriteLine("[Server]: Starting simulation...");
+
+            for (int i = 0; i < 100; i++)
             {
-                string randomLetters = GenerateRandomLetters(10); // 100 random letters per line.
-                byte[] msg = Encoding.ASCII.GetBytes(randomLetters);
+                string simulatedMessage = GenerateRandomLetters(10); // Generate random letters for the message
+                byte[] msg = Encoding.ASCII.GetBytes(simulatedMessage);
                 stream.Write(msg, 0, msg.Length);
 
-                Console.WriteLine("[Server]: Sending {0}", randomLetters);
+                Console.WriteLine("[Server]: Sent {0}", simulatedMessage); // Label added
 
-                Thread.Sleep(50); // Introduce a small delay between each message.
+                Thread.Sleep(50); // Add a small delay between each message.
             }
+
+            Console.WriteLine("[Server]: Simulation complete.");
         }
     }
 }
